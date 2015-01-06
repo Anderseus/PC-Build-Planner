@@ -1,17 +1,32 @@
 package com.example.wchoi.pcbuildplanner;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.widget.ArrayAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class Home extends Activity {
+public class Home extends ListActivity {
+
+    private List<Build> builds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_home);
+
+        builds = new ArrayList<Build>();
+        builds.add(new Build("0", "Build 1"));
+        ArrayAdapter<Build> adapter = new ArrayAdapter<Build>(this, R.layout.list_item_layout, builds);
+        setListAdapter(adapter);
     }
 
 
