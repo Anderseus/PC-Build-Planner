@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,10 @@ import java.util.List;
 
 public class EditBuild extends ListActivity {
 
-    private List<ArrayList<String>> parts;
+    private String buildId;
+    private String buildTitle;
+    private List<Part> parts;
+    private TextView buildName;
 
     private void refreshPostList() {
 
@@ -27,11 +32,29 @@ public class EditBuild extends ListActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_edit_build);
 
-        parts = new ArrayList<ArrayList<String>>();
-        ArrayAdapter<ArrayList<String>> adapter = new ArrayAdapter<ArrayList<String>>(this, R.layout.list_item_layout, parts);
+        Intent intent = this.getIntent();
+        buildName = (TextView)findViewById(R.id.textView);
+
+        parts = new ArrayList<Part>();
+        ArrayAdapter<Part> adapter = new ArrayAdapter<Part>(this, R.layout.list_item_layout, parts);
         setListAdapter(adapter);
 
-        refreshPostList();
+        if(intent.getExtras() != null) {
+            buildId = intent.getStringExtra("id");
+            buildTitle = intent.getStringExtra("title");
+            buildName.setText(buildTitle);
+            parts.add((Part)intent.getSerializableExtra("cpu"));
+            parts.add((Part)intent.getSerializableExtra("mobo"));
+            parts.add((Part)intent.getSerializableExtra("ram"));
+            parts.add((Part)intent.getSerializableExtra("gpu"));
+            parts.add((Part)intent.getSerializableExtra("psu"));
+            parts.add((Part)intent.getSerializableExtra("storage"));
+            parts.add((Part)intent.getSerializableExtra("tower"));
+            parts.add((Part)intent.getSerializableExtra("odd"));
+            parts.add((Part)intent.getSerializableExtra("cpu_cooler"));
+            parts.add((Part)intent.getSerializableExtra("others"));
+
+        }
     }
 
 

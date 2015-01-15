@@ -72,16 +72,16 @@ public class Home extends ListActivity {
         Intent intent = new Intent(this, EditBuild.class);
         intent.putExtra("id", build.getId());
         intent.putExtra("title", build.getTitle());
-        intent.putExtra("cpu", build.getCpu());
-        intent.putExtra("mobo", build.getMobo());
-        intent.putExtra("gpu", build.getGpu());
-        intent.putExtra("psu", build.getPsu());
-        intent.putExtra("storage", build.getStorage());
-        intent.putExtra("tower", build.getTower());
-        intent.putExtra("ram", build.getRam());
-        intent.putExtra("odd", build.getOdd());
-        intent.putExtra("cpu_cooler", build.getCpu_cooler());
-        intent.putExtra("others", build.getOthers());
+        intent.putExtra("cpu", new Part("CPU", build.getCpu()));
+        intent.putExtra("mobo", new Part("Motherboard", build.getMobo()));
+        intent.putExtra("ram", new Part("Memory", build.getRam()));
+        intent.putExtra("gpu", new Part("Video Card", build.getGpu()));
+        intent.putExtra("psu", new Part("Power Supply", build.getPsu()));
+        intent.putExtra("storage", new Part("Storage", build.getStorage()));
+        intent.putExtra("tower", new Part("Case", build.getTower()));
+        intent.putExtra("odd", new Part("Optical Drive", build.getOdd()));
+        intent.putExtra("cpu_cooler", new Part("CPU Cooler", build.getCpu_cooler()));
+        intent.putExtra("others", new Part("Others", build.getOthers()));
         startActivity(intent);
     }
 
