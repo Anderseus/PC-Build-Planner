@@ -1,12 +1,13 @@
 package com.example.wchoi.pcbuildplanner;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class EditBuild extends Activity {
+public class EditBuild extends ListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

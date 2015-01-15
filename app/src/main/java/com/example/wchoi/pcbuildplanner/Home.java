@@ -3,6 +3,7 @@ package com.example.wchoi.pcbuildplanner;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
@@ -23,7 +26,26 @@ public class Home extends ListActivity {
     private List<Build> builds;
 
     private void refreshPostList() {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Products");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Builds");
+        setProgressBarIndeterminateVisibility(true);
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                setProgressBarIndeterminateVisibility(false);
+                if(e == null) {
+
+                    builds.clear();
+                    for(ParseObject build : parseObjects) {
+                        builds.add(new Build(build.getObjectId(), build.getString("title")));
+                    }
+                    ((ArrayAdapter<Build>)getListAdapter()).notifyDataSetChanged();
+                }
+                else {
+                    Log.d(getClass().getSimpleName(), "Error: " + e.getMessage());
+                }
+            }
+        });
     }
 
     @Override
@@ -32,10 +54,15 @@ public class Home extends ListActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_home);
 
+        /* ParseObject testObject = new ParseObject("Builds");
+        testObject.put("foo", "bar");
+        testObject.saveInBackground(); */
+
         builds = new ArrayList<Build>();
-        builds.add(new Build("0", "Build 1"));
         ArrayAdapter<Build> adapter = new ArrayAdapter<Build>(this, R.layout.list_item_layout, builds);
         setListAdapter(adapter);
+
+        refreshPostList();
     }
 
 
