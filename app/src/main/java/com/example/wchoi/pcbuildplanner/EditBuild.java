@@ -60,7 +60,11 @@ public class EditBuild extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-
+        Intent intent = new Intent(this, EditPart.class);
+        Log.d("", String.valueOf(position) + ", " + String.valueOf(id));
+        Part part = parts.get(position);
+        intent.putExtra("category", part.label);
+        startActivity(intent);
     }
 
     @Override
