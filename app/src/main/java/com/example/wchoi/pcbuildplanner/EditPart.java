@@ -7,9 +7,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class EditPart extends ListActivity {
@@ -17,6 +22,7 @@ public class EditPart extends ListActivity {
     TextView category;
     EditText editText;
     Button button;
+    private List<String> products;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,17 +32,27 @@ public class EditPart extends ListActivity {
         Intent intent = this.getIntent();
         category = (TextView)findViewById(R.id.textView);
         category.setText(intent.getStringExtra("category"));
+
+        products = new ArrayList<String>();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.list_item_layout, products);
+        setListAdapter(adapter);
+
         editText = (EditText)findViewById(R.id.extractEditText);
         button = (Button)findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String search = editText.getText().toString();
-
+                // use the search string to get list of items from api
+                // add list of items to the products arrayList
             }
         });
     }
 
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        // go back to parts list
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
