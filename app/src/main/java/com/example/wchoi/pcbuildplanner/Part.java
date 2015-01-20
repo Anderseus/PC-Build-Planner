@@ -1,11 +1,12 @@
 package com.example.wchoi.pcbuildplanner;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by 2015wchoi on 1/15/2015.
  */
-public class Part extends ArrayList<String> {
+public class Part implements Serializable {
 
     String label;
     ArrayList<String> content;

@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -53,10 +55,13 @@ public class EditBuild extends ListActivity {
             parts.add((Part)intent.getSerializableExtra("odd"));
             parts.add((Part)intent.getSerializableExtra("cpu_cooler"));
             parts.add((Part)intent.getSerializableExtra("others"));
-
         }
     }
 
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

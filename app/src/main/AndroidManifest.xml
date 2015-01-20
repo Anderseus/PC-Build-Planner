@@ -24,6 +24,10 @@
             android:name=".EditBuild"
             android:label="@string/title_activity_edit_build" >
         </activity>
+        <activity
+            android:name=".EditPart"
+            android:label="@string/title_activity_edit_part" >
+        </activity>
     </application>
 
 </manifest>
