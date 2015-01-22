@@ -16,13 +16,20 @@ public class Part implements Serializable {
         this.content = content;
     }
 
-    @Override
-    public String toString() {
-        if(content == null) {
-            return label;
+    public String getLabel() {
+        return label;
+    }
+
+    public String getProduct() {
+        if(content != null) {
+            return content.get(0);
         }
-        else {
-            return label + ": " + content.get(1);
+        return "Part not selected";
+    }
+    public String getPrice() {
+        if(content != null) {
+            return content.get(1);
         }
+        return "$0";
     }
 }

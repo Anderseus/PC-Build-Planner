@@ -7,12 +7,16 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,10 +40,12 @@ public class EditPart extends ListActivity {
     Button button;
     public List<String> products;
     public List<String> prices;
+    public ArrayList<Part2> parts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_edit_part);
 
         Intent intent = this.getIntent();
@@ -48,7 +54,8 @@ public class EditPart extends ListActivity {
 
         products = new ArrayList<String>();
         prices = new ArrayList<String>();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.list_item_layout, products);
+        parts = new ArrayList<Part2>();
+        PartAdapter adapter = new PartAdapter(this, R.layout.list_item_layout_edit_part, parts);
         setListAdapter(adapter);
 
         editText = (EditText) findViewById(R.id.extractEditText);
@@ -57,14 +64,55 @@ public class EditPart extends ListActivity {
             @Override
             public void onClick(View view) {
                 String keywords = editText.getText().toString();
-                new RetrieveFeedTask(EditPart.this).execute(new String[]{"http://open.api.ebay.com/shopping?callname=FindPopularItems&responseencoding=XML&appid=TJHSST78e-e81b-4852-9bae-1f4018a870f&siteid=0&QueryKeywords=" + keywords + ":&version=713"});
-                Log.d("", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                for(String product : products) {
-                    Log.d("", product);
-                }
+                new RetrieveFeedTask(EditPart.this).execute(new String[]{
+                        "http://open.api.ebay.com/shopping?callname=FindPopularItems&responseencoding=XML&appid=TJHSST78e-e81b-4852-9bae-1f4018a870f&siteid=0&QueryKeywords="
+                                + keywords
+                                + ":&version=713"
+                });
+                Log.d("", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                setProgressBarIndeterminateVisibility(true);
             }
         });
 
+
+    }
+
+    class PartAdapter extends ArrayAdapter<Part2> {
+
+        private ArrayList<Part2> parts;
+        private PartViewHolder partViewHolder;
+
+        private class PartViewHolder {
+            TextView product;
+            TextView price;
+        }
+
+        public PartAdapter(Context context, int resId, ArrayList<Part2> parts) {
+            super(context, resId, parts);
+            this.parts = parts;
+        }
+
+        @Override
+        public View getView(int pos, View convertView, ViewGroup parent) {
+            View v = convertView;
+            if (v == null) {
+                LayoutInflater vi = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                v = vi.inflate(R.layout.list_item_layout_edit_part, null);
+                partViewHolder = new PartViewHolder();
+                partViewHolder.product = (TextView)v.findViewById(R.id.textView);
+                partViewHolder.price = (TextView)v.findViewById(R.id.textView2);
+                v.setTag(partViewHolder);
+            } else partViewHolder = (PartViewHolder)v.getTag();
+
+            Part2 part = parts.get(pos);
+
+            if (part != null) {
+                partViewHolder.product.setText(part.getProduct());
+                partViewHolder.price.setText(part.getPrice());
+            }
+
+            return v;
+        }
     }
 
     public void update() {
@@ -74,7 +122,8 @@ public class EditPart extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        // go back to parts list
+
+        finish();
     }
 }
 
@@ -89,6 +138,7 @@ class RetrieveFeedTask extends AsyncTask<String, Void, String> {
         activityName = context;
     }
 
+    @Override
     protected String doInBackground(String... urls) {
         try {
             URL url = new URL(urls[0]);
@@ -123,11 +173,21 @@ class RetrieveFeedTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String feed) {
         super.onPostExecute(feed);
         EditPart activity = (EditPart)activityName;
-        Log.d("", "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-        activity.products = titleArray;
-        activity.prices = priceArray;
+        Log.d("", "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+        //activity.products = titleArray;
+        activity.products.clear();
+        activity.products.addAll(titleArray);
+        activity.prices.clear();
+        activity.prices.addAll(priceArray);
+        activity.parts.clear();
+        for(int i = 0; i < activity.products.size(); i++) {
+            String a = activity.products.get(i);
+            String b = "$" + activity.prices.get(i);
+            Part2 part = new Part2(a, b);
+            activity.parts.add(part);
+        }
         activity.update();
-
-        Log.d("", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+        activity.setProgressBarIndeterminateVisibility(false);
+        Log.d("", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
     }
 }

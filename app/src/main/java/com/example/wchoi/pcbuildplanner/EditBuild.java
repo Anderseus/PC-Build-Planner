@@ -2,12 +2,15 @@ package com.example.wchoi.pcbuildplanner;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -21,7 +24,7 @@ public class EditBuild extends ListActivity {
 
     private String buildId;
     private String buildTitle;
-    private List<Part> parts;
+    private ArrayList<Part> parts;
     private TextView buildName;
 
     private void refreshPostList() {
@@ -38,7 +41,7 @@ public class EditBuild extends ListActivity {
         buildName = (TextView)findViewById(R.id.textView);
 
         parts = new ArrayList<Part>();
-        ArrayAdapter<Part> adapter = new ArrayAdapter<Part>(this, R.layout.list_item_layout, parts);
+        BuildAdapter adapter = new BuildAdapter(this, R.layout.list_item_layout_edit_build, parts);
         setListAdapter(adapter);
 
         if(intent.getExtras() != null) {
@@ -58,10 +61,51 @@ public class EditBuild extends ListActivity {
         }
     }
 
+    class BuildAdapter extends ArrayAdapter<Part> {
+
+        private ArrayList<Part> parts;
+        private PartViewHolder partViewHolder;
+
+        private class PartViewHolder {
+            TextView label;
+            TextView product;
+            TextView price;
+        }
+
+        public BuildAdapter(Context context, int resId, ArrayList<Part> parts) {
+            super(context, resId, parts);
+            this.parts = parts;
+        }
+
+        @Override
+        public View getView(int pos, View convertView, ViewGroup parent) {
+            View v = convertView;
+            if (v == null) {
+                LayoutInflater vi = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                v = vi.inflate(R.layout.list_item_layout_edit_build, null);
+                partViewHolder = new PartViewHolder();
+                partViewHolder.label = (TextView)v.findViewById(R.id.textView);
+                partViewHolder.product = (TextView)v.findViewById(R.id.textView2);
+                partViewHolder.price = (TextView)v.findViewById(R.id.textView3);
+                v.setTag(partViewHolder);
+            } else partViewHolder = (PartViewHolder)v.getTag();
+
+            Part part = parts.get(pos);
+
+            if (part != null) {
+                partViewHolder.label.setText(part.getLabel());
+                partViewHolder.product.setText(part.getProduct());
+                partViewHolder.price.setText(part.getPrice());
+            }
+            return v;
+        }
+    }
+
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Intent intent = new Intent(this, EditPart.class);
         intent.putExtra("category", parts.get(position).label);
+        intent.putExtra("buildId", buildId);
         startActivity(intent);
     }
 

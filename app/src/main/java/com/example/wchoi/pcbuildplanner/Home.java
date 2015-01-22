@@ -1,6 +1,8 @@
 package com.example.wchoi.pcbuildplanner;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,12 +11,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,8 +105,45 @@ public class Home extends ListActivity {
         int id = item.getItemId();
         switch(id) {
             case R.id.action_new: {
-                Intent intent = new Intent(this, EditBuild.class);
-                startActivity(intent);
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+                alert.setTitle("New Build");
+                alert.setMessage("Enter build name:");
+
+                final EditText input = new EditText(this);
+                alert.setView(input);
+
+                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String name = String.valueOf(input.getText());
+                        if(name.length() != 0) {
+                            final ParseObject post = new ParseObject("Builds");
+                            post.put("title", name);
+                            post.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if(e != null) {
+                                        Toast.makeText(getApplicationContext(), "Failed to Save to Parse", Toast.LENGTH_SHORT).show();
+                                        Log.d(getClass().getSimpleName(), "User update error: " + e);
+                                    }
+                                }
+                            });
+
+                            refreshPostList();
+                        }
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                alert.show();
+
                 break;
             }
             case R.id.action_refresh: {
