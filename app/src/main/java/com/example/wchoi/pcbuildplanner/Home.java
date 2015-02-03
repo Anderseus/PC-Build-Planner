@@ -75,18 +75,7 @@ public class Home extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Build build = builds.get(position);
         Intent intent = new Intent(this, EditBuild.class);
-        intent.putExtra("id", build.getId());
-        intent.putExtra("title", build.getTitle());
-        intent.putExtra("cpu", new Part("CPU", build.getCpu()));
-        intent.putExtra("mobo", new Part("Motherboard", build.getMobo()));
-        intent.putExtra("ram", new Part("Memory", build.getRam()));
-        intent.putExtra("gpu", new Part("Video Card", build.getGpu()));
-        intent.putExtra("psu", new Part("Power Supply", build.getPsu()));
-        intent.putExtra("storage", new Part("Storage", build.getStorage()));
-        intent.putExtra("tower", new Part("Case", build.getTower()));
-        intent.putExtra("odd", new Part("Optical Drive", build.getOdd()));
-        intent.putExtra("cpu_cooler", new Part("CPU Cooler", build.getCpu_cooler()));
-        intent.putExtra("others", new Part("Others", build.getOthers()));
+        intent.putExtra("build", build);
         startActivity(intent);
     }
 

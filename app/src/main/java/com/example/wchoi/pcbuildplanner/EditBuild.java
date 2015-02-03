@@ -16,19 +16,33 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class EditBuild extends ListActivity {
 
-    private String buildId;
-    private String buildTitle;
+    private Build build;
     private ArrayList<Part> parts;
     private TextView buildName;
 
     private void refreshPostList() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Builds");
+        setProgressBarIndeterminateVisibility(true);
 
+        query.getInBackground(build.getId(), new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if (e == null) {
+
+                }
+            }
+        });
     }
 
     @Override
@@ -45,20 +59,21 @@ public class EditBuild extends ListActivity {
         setListAdapter(adapter);
 
         if(intent.getExtras() != null) {
-            buildId = intent.getStringExtra("id");
-            buildTitle = intent.getStringExtra("title");
-            buildName.setText(buildTitle);
-            parts.add((Part)intent.getSerializableExtra("cpu"));
-            parts.add((Part)intent.getSerializableExtra("mobo"));
-            parts.add((Part)intent.getSerializableExtra("ram"));
-            parts.add((Part)intent.getSerializableExtra("gpu"));
-            parts.add((Part)intent.getSerializableExtra("psu"));
-            parts.add((Part)intent.getSerializableExtra("storage"));
-            parts.add((Part)intent.getSerializableExtra("tower"));
-            parts.add((Part)intent.getSerializableExtra("odd"));
-            parts.add((Part)intent.getSerializableExtra("cpu_cooler"));
-            parts.add((Part)intent.getSerializableExtra("others"));
+            build = (Build)intent.getSerializableExtra("build");
+            buildName.setText(build.getTitle());
+            parts.add(new Part("CPU", build.getCpu()));
+            parts.add(new Part("Motherboard", build.getMobo()));
+            parts.add(new Part("Memory", build.getRam()));
+            parts.add(new Part("Graphics", build.getGpu()));
+            parts.add(new Part("Power", build.getPsu()));
+            parts.add(new Part("Storage", build.getStorage()));
+            parts.add(new Part("Case", build.getTower()));
+            parts.add(new Part("Optical", build.getOdd()));
+            parts.add(new Part("Cooler", build.getCpu_cooler()));
+            parts.add(new Part("Others", build.getOthers()));
         }
+
+        refreshPostList();
     }
 
     class BuildAdapter extends ArrayAdapter<Part> {
@@ -95,7 +110,7 @@ public class EditBuild extends ListActivity {
             if (part != null) {
                 partViewHolder.label.setText(part.getLabel());
                 partViewHolder.product.setText(part.getProduct());
-                partViewHolder.price.setText(part.getPrice());
+                partViewHolder.price.setText("$" + part.getPrice());
             }
             return v;
         }
@@ -105,7 +120,7 @@ public class EditBuild extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Intent intent = new Intent(this, EditPart.class);
         intent.putExtra("category", parts.get(position).label);
-        intent.putExtra("buildId", buildId);
+        intent.putExtra("build", build);
         startActivity(intent);
     }
 

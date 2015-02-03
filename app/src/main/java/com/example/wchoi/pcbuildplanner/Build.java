@@ -1,11 +1,12 @@
 package com.example.wchoi.pcbuildplanner;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by 2015wchoi on 1/5/2015.
  */
-public class Build {
+public class Build implements Serializable{
 
     private String id;
     private String title;

@@ -19,6 +19,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -35,12 +43,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class EditPart extends ListActivity {
 
-    TextView category;
+    Build build;
+    String category;
+    TextView textView;
     EditText editText;
     Button button;
     public List<String> products;
     public List<String> prices;
-    public ArrayList<Part2> parts;
+    public ArrayList<Part> parts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +59,14 @@ public class EditPart extends ListActivity {
         setContentView(R.layout.activity_edit_part);
 
         Intent intent = this.getIntent();
-        category = (TextView) findViewById(R.id.textView);
-        category.setText(intent.getStringExtra("category"));
+        build = (Build)intent.getSerializableExtra("build");
+        category = intent.getStringExtra("category");
+        textView = (TextView) findViewById(R.id.textView);
+        textView.setText(category);
 
         products = new ArrayList<String>();
         prices = new ArrayList<String>();
-        parts = new ArrayList<Part2>();
+        parts = new ArrayList<Part>();
         PartAdapter adapter = new PartAdapter(this, R.layout.list_item_layout_edit_part, parts);
         setListAdapter(adapter);
 
@@ -77,9 +89,9 @@ public class EditPart extends ListActivity {
 
     }
 
-    class PartAdapter extends ArrayAdapter<Part2> {
+    class PartAdapter extends ArrayAdapter<Part> {
 
-        private ArrayList<Part2> parts;
+        private ArrayList<Part> parts;
         private PartViewHolder partViewHolder;
 
         private class PartViewHolder {
@@ -87,7 +99,7 @@ public class EditPart extends ListActivity {
             TextView price;
         }
 
-        public PartAdapter(Context context, int resId, ArrayList<Part2> parts) {
+        public PartAdapter(Context context, int resId, ArrayList<Part> parts) {
             super(context, resId, parts);
             this.parts = parts;
         }
@@ -104,7 +116,7 @@ public class EditPart extends ListActivity {
                 v.setTag(partViewHolder);
             } else partViewHolder = (PartViewHolder)v.getTag();
 
-            Part2 part = parts.get(pos);
+            Part part = parts.get(pos);
 
             if (part != null) {
                 partViewHolder.product.setText(part.getProduct());
@@ -121,8 +133,27 @@ public class EditPart extends ListActivity {
 
 
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    protected void onListItemClick(ListView l, View v, final int position, long id) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Builds");
+        setProgressBarIndeterminateVisibility(true);
 
+        query.getInBackground(build.getId(), new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(e == null) {
+                    parseObject.put(category, parts.get(position).content);
+                    parseObject.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e != null) {
+                                Toast.makeText(getApplicationContext(), "Failed to Save to Parse", Toast.LENGTH_SHORT).show();
+                                Log.d(getClass().getSimpleName(), "User update error: " + e);
+                            }
+                        }
+                    });
+                }
+            }
+        });
         finish();
     }
 }
@@ -183,7 +214,10 @@ class RetrieveFeedTask extends AsyncTask<String, Void, String> {
         for(int i = 0; i < activity.products.size(); i++) {
             String a = activity.products.get(i);
             String b = "$" + activity.prices.get(i);
-            Part2 part = new Part2(a, b);
+            ArrayList<String> temp = new ArrayList<String>();
+            temp.add(a);
+            temp.add(b);
+            Part part = new Part(activity.category, temp);
             activity.parts.add(part);
         }
         activity.update();
